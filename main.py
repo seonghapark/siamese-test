@@ -17,9 +17,12 @@ import torch.nn.functional as F
 from torch import nn, optim
 import torch.distributed as dist
 import torchvision.datasets as datasets
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader, Dataset
 
+from siamese_net import SiameseNetwork
 from dataset import SiameseNetworkDataset
-from constrastive import ContrastiveLoss
+from contrastive import ContrastiveLoss
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Pretrain a resnet model with VICReg", add_help=False)
@@ -75,6 +78,10 @@ def main(args):
                                          transforms.ToTensor()])
     siamese_dataset = SiameseNetworkDataset(imageFolderDataset=folder_dataset,
                                             transform=transformation)
+    loader = DataLoader(siamese_dataset,
+                            shuffle=True,
+                            num_workers=8,
+                            batch_size=args.batch_size)
 
 
     start_time = last_logging = time.time()
@@ -88,7 +95,7 @@ def main(args):
 
             optimizer.zero_grad()
             output1, output2 = model(x, y)
-            loss = criterion(output1, outpu2, label)
+            loss = criterion(output1, output2, label)
             loss.backward()
             optimizer.step()
 

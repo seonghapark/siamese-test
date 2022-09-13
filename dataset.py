@@ -3,6 +3,7 @@ import random
 from PIL import Image
 import PIL.ImageOps
 
+import torch
 import torchvision
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
