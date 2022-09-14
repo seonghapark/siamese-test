@@ -95,11 +95,11 @@ def with_the_folders(args):
     files2 = sorted(glob.glob(name))
 
     if args.data_dir1 == args.data_dir2:
-        loader1, loader2 = same_folder(args, files1)
+        values = same_folder(args, files1)
     else:
-        loader1, loader2 = diff_folders(args, files1, files2)
+        values = diff_folders(args, files1, files2)
 
-    return loader1, loader2
+    return values
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pretrain a resnet model with VICReg", add_help=False)
