@@ -60,6 +60,12 @@ def main(args):
 
     model = SiameseNetwork().cuda(gpu)
 
+    if args.rank == 0:
+        args.exp_dir.mkdir(parents=True, exist_ok=True)
+        stats_file = open(args.exp_dir / "stats.txt", "a", buffering=1)
+        print(" ".join(sys.argv))
+        print(" ".join(sys.argv), file=stats_file)
+
     if (args.exp_dir / "model.pth").is_file():
         if args.rank == 0:
             print("resuming from checkpoint")
@@ -109,6 +115,7 @@ def main(args):
                     lr=lr,
                 )
                 print(json.dumps(stats))
+                print(json.dumps(stats), file=stats_file)
                 last_logging = current_time
         if args.rank == 0:
             state = dict(

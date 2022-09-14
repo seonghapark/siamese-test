@@ -114,7 +114,13 @@ if __name__ == "__main__":
 
     folders = sorted(os.listdir(args.data_dir))
 
-    limit = 50
+    args.exp_dir.mkdir(parents=True, exist_ok=True)
+    stats_file = open(args.exp_dir / "stats.txt", "a", buffering=1)
+    print(" ".join(sys.argv))
+    print(" ".join(sys.argv), file=stats_file)
+
+
+    limit = 20
 
     with open('dissimilarity.txt', 'w') as f:
         for i in folders:
