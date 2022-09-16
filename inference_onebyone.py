@@ -123,15 +123,16 @@ if __name__ == "__main__":
 
     limit = 20
 
-    with open('dissimilarity.txt', 'w') as f:
-        for i in folders:
-            for j in folders:
-                if int(i) < limit and int(j) < limit:
-                    args.data_dir1 = args.data_dir + i + '/'
-                    args.data_dir2 = args.data_dir + j + '/'
+    outputfile = open('dissimilarity.txt', 'a', buffering=1)
+    for i in folders:
+        for j in folders:
+            if int(i) < limit and int(j) < limit:
+                args.data_dir1 = args.data_dir + i + '/'
+                args.data_dir2 = args.data_dir + j + '/'
 
-                    values = with_the_folders(args)
-                    v = np.asarray(values)
-                    l = str(i) + ',' + str(j) + ',' + str(v.mean()) + '\n'
-                    f.write(l)
-                    print(i, j, v.mean())
+                values = with_the_folders(args)
+                v = np.asarray(values)
+                l = str(i) + ',' + str(j) + ',' + str(v.mean())
+
+                print(json.dumps(l))
+                print(json.dumps(l), file=outputfile)
