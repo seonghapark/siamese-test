@@ -19,6 +19,7 @@ import argparse
 import os
 import glob
 import sys
+import json
 
 class Main():
     def __init__(self, args):
@@ -41,6 +42,7 @@ class Main():
         return euclidean_distance.item()
 
 def same_folder(args, files):
+    values = []
     for i in range(len(files)):
         if i != len(files)-1:
             args.data_dir1 = files[i]
@@ -56,8 +58,7 @@ def same_folder(args, files):
         val_loader = torch.utils.data.DataLoader(
             val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
 
-        values = []
-        val = np.asarray(main.run(args, train_loader, val_loader))
+        val = main.run(args, train_loader, val_loader)
         values.append(val)
 
     return values
@@ -71,6 +72,7 @@ def diff_folders(args, f1, f2):
         files1 = f2
         files2 = f1
 
+    values = []
     for i in range(len(files1)):
         args.data_dir1 = files1[i]
         args.data_dir2 = files2[i]
@@ -82,8 +84,7 @@ def diff_folders(args, f1, f2):
         val_loader = torch.utils.data.DataLoader(
             val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
 
-        values = []
-        val = np.asarray(main.run(args, train_loader, val_loader))
+        val = main.run(args, train_loader, val_loader)
         values.append(val)
 
     return values
@@ -121,17 +122,22 @@ if __name__ == "__main__":
     print(" ".join(sys.argv), file=stats_file)
 
 
-    limit = 20
+    lower_limit = 0
+    upper_limit = 1000
+
 
     outputfile = open('dissimilarity.txt', 'a', buffering=1)
     for i in folders:
         for j in folders:
-            if int(i) < limit and int(j) < limit:
+            if int(i) > lower_limit and int(i) <= upper_limit and int(j) > lower_limit and int(j) <= upper_limit:
                 args.data_dir1 = args.data_dir + i + '/'
                 args.data_dir2 = args.data_dir + j + '/'
 
                 values = with_the_folders(args)
                 v = np.asarray(values)
+
+                print(values)
+
                 l = str(i) + ',' + str(j) + ',' + str(v.mean())
 
                 print(json.dumps(l))
