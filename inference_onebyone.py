@@ -44,22 +44,26 @@ class Main():
 def same_folder(args, files):
     values = []
     for i in range(len(files)):
-        if i != len(files)-1:
-            args.data_dir1 = files[i]
-            args.data_dir2 = files[i+1]
-        else:
-            args.data_dir1 = files[i]
-            args.data_dir2 = files[i-1]
+       for j in range(len(files)):
+            if j >= i:
+                args.data_dir1 = files[i]
+                args.data_dir2 = files[j]
 
-        train_dataset = BasicDataset(args.data_dir1)
-        val_dataset = BasicDataset(args.data_dir2)
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True)
-        val_loader = torch.utils.data.DataLoader(
-            val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
+                train_dataset = BasicDataset(args.data_dir1)
+                val_dataset = BasicDataset(args.data_dir2)
+                train_loader = torch.utils.data.DataLoader(
+                    train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True)
+                val_loader = torch.utils.data.DataLoader(
+                    val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
 
-        val = main.run(args, train_loader, val_loader)
-        values.append(val)
+                val = main.run(args, train_loader, val_loader)
+                values.append(val)
+
+
+                ### only for same folders
+                l = args.data_dir1 + ',' + args.data_dir2 + ',' + str(val)
+                print(json.dumps(l))
+                print(json.dumps(l), file=outputfile)
 
     return values
 
@@ -74,18 +78,25 @@ def diff_folders(args, f1, f2):
 
     values = []
     for i in range(len(files1)):
-        args.data_dir1 = files1[i]
-        args.data_dir2 = files2[i]
+        for j in range(len(files2)):
+            args.data_dir1 = files1[i]
+            args.data_dir2 = files2[j]
 
-        train_dataset = BasicDataset(args.data_dir1)
-        val_dataset = BasicDataset(args.data_dir2)
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True)
-        val_loader = torch.utils.data.DataLoader(
-            val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
+            train_dataset = BasicDataset(args.data_dir1)
+            val_dataset = BasicDataset(args.data_dir2)
+            train_loader = torch.utils.data.DataLoader(
+                train_dataset, batch_size=1, shuffle=True, num_workers=8, pin_memory=True)
+            val_loader = torch.utils.data.DataLoader(
+                val_dataset, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
 
-        val = main.run(args, train_loader, val_loader)
-        values.append(val)
+            val = main.run(args, train_loader, val_loader)
+            values.append(val)
+
+
+            ### only for diff folders
+            l = args.data_dir1 + ',' + args.data_dir2 + ',' + str(val)
+            print(json.dumps(l))
+            print(json.dumps(l), file=outputfile)
 
     return values
 
@@ -123,10 +134,9 @@ if __name__ == "__main__":
 
 
     lower_limit = 0
-    upper_limit = 1000
+    upper_limit = 20
 
-
-    outputfile = open('dissimilarity.txt', 'a', buffering=1)
+    outputfile = open('dissimilarity_onebyone.txt', 'a', buffering=1)
     for i in folders:
         for j in folders:
             if int(i) > lower_limit and int(i) <= upper_limit and int(j) > lower_limit and int(j) <= upper_limit:
@@ -136,9 +146,32 @@ if __name__ == "__main__":
                 values = with_the_folders(args)
                 v = np.asarray(values)
 
-                print(values)
-
                 l = str(i) + ',' + str(j) + ',' + str(v.mean())
 
                 print(json.dumps(l))
                 print(json.dumps(l), file=outputfile)
+
+
+    '''
+    #### only same folders
+    outputfile = open('dissimilarity_same.txt', 'a', buffering=1)
+    for i in folders:
+        args.data_dir1 = args.data_dir2 = args.data_dir + i + '/'
+        values = with_the_folders(args)
+        v = np.asarray(values)
+    '''
+
+    '''
+    #### only different folders
+    outputfile = open('dissimilarity_diff.txt', 'a', buffering=1)
+    for i in folders:
+        for j in folders:
+            if i == j:
+                pass
+            elif int(i) > lower_limit and int(i) <= upper_limit and int(j) > lower_limit and int(j) <= upper_limit:
+                args.data_dir1 = args.data_dir + i + '/'
+                args.data_dir2 = args.data_dir + j + '/'
+
+                values = with_the_folders(args)
+                v = np.asarray(values)
+    '''
