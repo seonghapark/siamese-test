@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from siamresnet import SiamResNet
 from siamese_net import SiameseNetwork
 from inference_dataset import BasicDataset
 
