@@ -25,7 +25,8 @@ import json
 class Main():
     def __init__(self, args):
         self.gpu = torch.device(args.device)
-        self.model = SiameseNetwork().cuda(self.gpu)
+        #self.model = SiameseNetwork().cuda(self.gpu)
+        self.model = SiamResNet(args).cuda(self.gpu)
 
         ckpt = torch.load(args.exp_dir / "model.pth", map_location="cpu")
         self.model.load_state_dict(ckpt["model"])
