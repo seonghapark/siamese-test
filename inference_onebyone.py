@@ -118,6 +118,8 @@ def with_the_folders(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Pretrain a resnet model with VICReg", add_help=False)
+    parser.add_argument("--arch", type=str, default="resnet50",
+                        help='Architecture of the backbone encoder network')
     parser.add_argument("--data-dir", type=str, default="/path/to/imagenet", required=True,
                         help='Path to the image net dataset')
     parser.add_argument("--exp-dir", type=Path, default="./exp",
