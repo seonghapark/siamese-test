@@ -20,12 +20,16 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Dataset
 
-from siamese_net import SiameseNetwork
+from siamresnet import SiamResNet
+#from siamese_net import SiameseNetwork
 from dataset import SiameseNetworkDataset
 from contrastive import ContrastiveLoss
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Pretrain a resnet model with VICReg", add_help=False)
+
+    parser.add_argument("--arch", type=str, default="resnet50",
+                        help='Architecture of the backbone encoder network')
 
     # Data
     parser.add_argument("--data-dir", type=Path, default="/path/to/imagenet", required=True,
@@ -58,7 +62,8 @@ def main(args):
     args.rank = 0
     gpu = torch.device(args.device)
 
-    model = SiameseNetwork().cuda(gpu)
+    #model = SiameseNetwork().cuda(gpu)
+    model = SiamResNet(args).cuda(gpu)
 
     if args.rank == 0:
         args.exp_dir.mkdir(parents=True, exist_ok=True)
@@ -100,7 +105,8 @@ def main(args):
             lr = adjust_learning_rate(args, optimizer, loader, step)
 
             optimizer.zero_grad()
-            output1, output2 = model(x, y)
+            #output1, output2 = model(x, y)
+            output1, output2 = model.forward(x, y)
             loss = criterion(output1, output2, label)
             loss.backward()
             optimizer.step()
