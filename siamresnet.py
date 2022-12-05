@@ -14,3 +14,8 @@ class SiamResNet(nn.Module):
         y = self.backbone(y)
 
         return x, y
+
+    def forward_once(self, x):
+        x = self.backbone(x)
+
+        return x
